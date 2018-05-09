@@ -205,19 +205,19 @@ function printData()
         var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].t), parseInt(sensor2.fullData[i].t)]
         temp.push(n)
 
-        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].h), parseInt(sensor2.fullData[i].h)]
+        var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].h), parseInt(sensor2.fullData[i].h)]
         hum.push(n)
 
-        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].p), parseInt(sensor2.fullData[i].p)]
+        var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].p), parseInt(sensor2.fullData[i].p)]
         bar.push(n)
 
-        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].l), parseInt(sensor2.fullData[i].l)]
+        var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].l), parseInt(sensor2.fullData[i].l)]
         lum.push(n)
 
-        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].c), parseInt(sensor2.fullData[i].c)]
+        var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].c), parseInt(sensor2.fullData[i].c)]
         CO2.push(n)
 
-        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].pp), parseInt(sensor2.fullData[i].pp)]
+        var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].pp), parseInt(sensor2.fullData[i].pp)]
         mov.push(n)
     }
 
