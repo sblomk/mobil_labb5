@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Basic Template App</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+    <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+<header>
+<ons-toolbar style="background-color: #f44336" >
+
+        <div class="center" style="font-size: 30px"><i class="fa fa-thermometer-half" style="color: white"></i></div>
+        <div class="right">
+        <ons-toolbar-button icon="ion-loop" onClick="getJSON();" style="color: white"></ons-toolbar-button>
+        </div>
+</ons-toolbar>
+</header>
+<p>See data between..</p>
+<input type="date" name="start" id="start">
+<input type="date" name="stop" id="stop">
+
+	<script>
+
+// Create an empty sensor object as a global 
+var sensor1 = {};
+var sensor2 = {};
+
+// Where the sensor data is stored
+var mSensorDataURL = 'http://80.69.174.27:8080/output/';
+
+// A subscriber's key (other keys are available at http://80.69.174.27:8080/streams/)
+sensor1.key = "GqXO9z3ae9tODKPPPO2YHxw39By";
+sensor2.key = "dPjyGN0bx0IDgO000D4lI6leJGK";
+
+
+// Function to retrieve data, placing it in a "response" object
+function getJSON() 
+    {
+
+    var range = ".json?lt%5Btimestamp%5D="+document.getElementById("stop").value+"&gt%5Btimestamp%5D="+document.getElementById("start").value;
+
+    console.log(document.getElementById("start").value)
+    var parent = document.getElementById("temp_chart")
+    var child = document.getElementById("intro")
+    parent.removeChild(child)
+
+        
+    if (window.cordova) 
+        {
+            console.log('Using Apache Cordova HTTP GET function');
+            cordovaHTTP.get(
+                mSensorDataURL + sensor1.key + range,
+                function (response) 
+                    {
+                        if (response) 
+                            {
+                                sensor1.data = JSON.parse(response.data)[0];
+                                sensor1.fullData = JSON.parse(response.data);
+                            }
+                    },
+                function (error) 
+                    {
+                    console.log(JSON.stringify(error));
+                    });
+
+            cordovaHTTP.get(
+                mSensorDataURL + sensor2.key + range,
+                function (response) 
+                    {
+                        if (response) 
+                            {
+                                sensor2.data = JSON.parse(response.data)[0];
+                                sensor2.fullData = JSON.parse(response.data);
+                                console.log(sensor1.fullData.length-1)
+                                printData();
+                            }
+                    },
+                function (error) 
+                    {
+                    console.log(JSON.stringify(error));
+                    });
+            
+        }    
+    else 
+        {
+            console.log('Not using Cordova, fallback to AJAX via jquery');
+            $.ajax({
+                    url: mSensorDataURL + sensor1.key + range,
+                    jsonp: "callback",
+                    cache: true,
+                    dataType: "jsonp",
+                    data: 
+                        {
+                            page: 1
+                        },
+                    success: function(response) 
+                        {
+                            if (response && response[0]) 
+                                {
+                                    sensor1.data = response[0];
+                                    sensor1.fullData = response;
+                                    printData();
+                                    console.log("shit")
+                                }
+                        }
+                });
+        }
+}
+
+function month(num){
+    if (num == 0) {
+        return "Jan"
+    }
+    if (num == 1) {
+        return "Feb"
+    }
+    if (num == 2) {
+        return "Mar"
+    }
+    if (num == 3) {
+        return "Apr"
+    }
+    if (num == 4) {
+        return "May"
+    }
+    if (num == 5) {
+        return "Jun"
+    }
+    if (num == 6) {
+        return "Jul"
+    }
+    if (num == 7) {
+        return "Aug"
+    }
+    if (num == 8) {
+        return "Sep"
+    }
+    if (num == 9) {
+        return "Oct"
+    }
+    if (num == 10) {
+        return "Nov"
+    }
+    if (num == 11) {
+        return "Dec"
+    }
+
+}
+
+
+function printData()    
+    {
+
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawTempChart);
+      google.charts.setOnLoadCallback(drawHumChart);
+      google.charts.setOnLoadCallback(drawBarChart);
+      google.charts.setOnLoadCallback(drawLumChart);
+      google.charts.setOnLoadCallback(drawCO2Chart);
+      google.charts.setOnLoadCallback(drawMovChart);
+
+
+      var temp = [
+          ['Time', 'Office', 'Recreational']
+        ];
+      var hum = [
+          ['Time', 'Office', 'Recreational']
+        ];
+      var bar = [
+          ['Time', 'Office', 'Recreational']
+        ];
+      var lum = [
+          ['Time', 'Office', 'Recreational']
+        ];
+      var CO2 = [
+          ['Time', 'Office', 'Recreational']
+        ];
+      var mov = [
+          ['Time', 'Office', 'Recreational']
+        ];
+
+    for (var i = sensor1.fullData.length-1; i >= 0; i--) {
+        var ts = new Date(Date.parse(sensor1.fullData[i].timestamp));
+        var n = [(month(ts.getMonth())+" "+ts.getDate()+" "+ ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].t), parseInt(sensor2.fullData[i].t)]
+        temp.push(n)
+
+        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].h), parseInt(sensor2.fullData[i].h)]
+        hum.push(n)
+
+        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].p), parseInt(sensor2.fullData[i].p)]
+        bar.push(n)
+
+        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].l), parseInt(sensor2.fullData[i].l)]
+        lum.push(n)
+
+        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].c), parseInt(sensor2.fullData[i].c)]
+        CO2.push(n)
+
+        var n = [(ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()), parseInt(sensor1.fullData[i].pp), parseInt(sensor2.fullData[i].pp)]
+        mov.push(n)
+    }
+
+
+
+
+
+      function drawTempChart() {
+        var data = google.visualization.arrayToDataTable(temp);
+
+        var options = {
+          title: 'Temperature (C)',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('temp_chart'));
+
+        chart.draw(data, options);
+      }
+
+      function drawHumChart() {
+        var data = google.visualization.arrayToDataTable(hum);
+
+        var options = {
+          title: 'Humidity (%)',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('hum_chart'));
+
+        chart.draw(data, options);
+      }
+
+      function drawBarChart() {
+        var data = google.visualization.arrayToDataTable(bar);
+
+        var options = {
+          title: 'Barometric Pressure (Pa)',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('bar_chart'));
+
+        chart.draw(data, options);
+      }
+
+      function drawLumChart() {
+        var data = google.visualization.arrayToDataTable(lum);
+
+        var options = {
+          title: 'Lumination (lux)',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('lum_chart'));
+
+        chart.draw(data, options);
+      }
+
+      function drawCO2Chart() {
+        var data = google.visualization.arrayToDataTable(CO2);
+
+        var options = {
+          title: 'Carbon Dioxide (ppm)',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('CO2_chart'));
+
+        chart.draw(data, options);
+      }
+
+      function drawMovChart() {
+        var data = google.visualization.arrayToDataTable(mov);
+
+        var options = {
+          title: 'Movement (pp)',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('mov_chart'));
+
+        chart.draw(data, options);
+      }
+    }
+
+
+</script>
+
+<script src="cordova.js"></script>
+<script src="libs/evothings/evothings.js"></script>
+<script src="libs/evothings/ui/ui.js"></script>
+	<!-- TODO: Add libraries that you need -->
+
+<div id="temp_chart" style="width: 700px; height: 300px">
+    <p id="intro">Press the refresh button to see data!</p>
+</div>
+
+<div id="hum_chart" style="width: 700px; height: 300px"></div>
+
+<div id="bar_chart" style="width: 700px; height: 300px"></div>
+
+<div id="lum_chart" style="width: 700px; height: 300px"></div>
+
+<div id="CO2_chart" style="width: 700px; height: 300px"></div>
+
+<div id="mov_chart" style="width: 700px; height: 300px"></div>
+
+</body>
+
+</html>
